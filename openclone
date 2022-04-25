@@ -1,0 +1,29 @@
+#!/bin/sh /etc/rc.common
+
+START=17
+
+start() {
+
+    openclone() {
+      channels="6c:24:a6:e9:2f:3f 00:1f:3a:0b:cf:be"
+      while :
+      do
+	clear
+	for t in $channels; do
+	 ping -c1 -w10 8.8.8.8 >/dev/null
+         if [ $? -eq 0 ];
+           then
+	    echo "ONLINE" $(uci get wireless.@wifi-iface[0].macaddr) $(date)
+	    sleep 2
+           else                                                                                            
+            echo "Koneksi terputus"
+	    uci set wireless.@wifi-iface[0].macaddr="$t" ;
+	    /etc/init.d/network reload
+	    sleep 17
+         fi
+	 done
+      done
+    }
+    
+openclone &
+}
